@@ -54,7 +54,15 @@ module BabySqueel
       when :function
         @table.func(name, *args)
       when :association
-        @table.association(name)
+        if @table._scope.reflect_on_association(name.to_s.singularize)
+          @table.association(name.to_s.singularize)
+        elsif @table._scope.reflect_on_association(name.to_s.singularize)
+          @table.association(name.to_s.pluralize)
+        elsif @table._table.name == name.to_s
+          @table
+        else
+          @table.association(name)
+        end
       when :column, :attribute
         @table[name]
       end
@@ -70,7 +78,9 @@ module BabySqueel
       when :column
         @table._scope.column_names.include?(name.to_s)
       when :association
-        !@table._scope.reflect_on_association(name).nil?
+        !@table._scope.reflect_on_association(name.to_s.singularize).nil? ||
+          !@table._scope.reflect_on_association(name.to_s.pluralize).nil? ||
+          @table._table.name == name.to_s
       when :function, :attribute
         true
       end

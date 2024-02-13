@@ -120,19 +120,21 @@ module BabySqueel
       end
 
       # Overrides ActiveRecord::QueryMethods#order
-      def order(*args, &block)
-        if block_given? && args.empty?
-          ordering(&block)
-        else
-          super
+      if ::ActiveRecord.version >= Gem::Version.new("5")
+        def order(*args, &block)
+          if block_given? && args.empty?
+            ordering(&block)
+          else
+            super
+          end
         end
-      end
-
-      def reorder(*args, &block)
-        if block_given? && args.empty?
-          reordering(&block)
-        else
-          super
+  
+        def reorder(*args, &block)
+          if block_given? && args.empty?
+            reordering(&block)
+          else
+            super
+          end
         end
       end
 
